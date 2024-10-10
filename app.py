@@ -1,7 +1,8 @@
 from database.connect import crashes
 from repository.csv_repository import init_db
 from repository.repository import get_all_crashes, get_all_daily_crashes, get_all_weekly_crashes, \
-    get_all_monthly_crashes, get_all_crash_causes, get_all_areas, get_all_injuries_by_area
+    get_all_monthly_crashes, get_all_crash_causes, get_all_areas, get_all_injuries_by_area, get_injuries_by_area, \
+    get_monthly_crashes_by_date, get_weekly_crashes_by_date, get_daily_crashes_by_date
 
 from flask import Flask, jsonify
 import json
@@ -84,7 +85,7 @@ def injuries_by_area():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/daily_crashes/<date>', methods=['GET'])
-def get_daily_crashes_by_date(date):
+def get_daily_crashes_date(date):
     try:
         result = get_daily_crashes_by_date(date)
         return jsonify(parse_json(result)), 200
@@ -93,7 +94,7 @@ def get_daily_crashes_by_date(date):
 
 
 @app.route('/weekly_crashes/<date>', methods=['GET'])
-def get_weekly_crashes_by_date(date):
+def get_weekly_crashes_by(date):
     try:
         result = get_weekly_crashes_by_date(date)
         return jsonify(parse_json(result)), 200
@@ -102,7 +103,7 @@ def get_weekly_crashes_by_date(date):
 
 
 @app.route('/monthly_crashes/<date>', methods=['GET'])
-def get_monthly_crashes_by_date(date):
+def get_monthly_crashes_date(date):
     try:
         result = get_monthly_crashes_by_date(date)
         return jsonify(parse_json(result)), 200
@@ -111,7 +112,7 @@ def get_monthly_crashes_by_date(date):
 
 
 @app.route('/injuries/<area>', methods=['GET'])
-def get_injuries_by_area(area):
+def get_injuries(area):
     try:
         result = get_injuries_by_area(area)
         return jsonify(parse_json(result)), 200
