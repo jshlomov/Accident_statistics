@@ -35,7 +35,7 @@ def init_db():
         # Create crash document
         crash = {
             "CRASH_RECORD_ID": row["CRASH_RECORD_ID"],
-            "CRASH_DATE": crash_date,
+            "CRASH_DATE": str(crash_date),
             "BEAT_OF_OCCURRENCE": row["BEAT_OF_OCCURRENCE"],
             "TOTAL_INJURIES": row["INJURIES_TOTAL"],
             "FATAL_INJURIES": row["INJURIES_FATAL"],
@@ -57,10 +57,10 @@ def init_db():
             cause = {
                 "PRIM_CONTRIBUTORY_CAUSE": crash["PRIM_CONTRIBUTORY_CAUSE"],
                 "CRASHES_LIST": [crash_id],
-                "TOTAL_INJURIES": crash["TOTAL_INJURIES"],
-                "FATAL_INJURIES": crash["FATAL_INJURIES"],
-                "INCAPACITATING_INJURIES": crash["INCAPACITATING_INJURIES"],
-                "INCAPACITATING_NON_INJURIES": crash["INCAPACITATING_NON_INJURIES"]
+                "TOTAL_INJURIES": int(crash["TOTAL_INJURIES"]),
+                "FATAL_INJURIES": int(crash["FATAL_INJURIES"]),
+                "INCAPACITATING_INJURIES": int(crash["INCAPACITATING_INJURIES"]),
+                "INCAPACITATING_NON_INJURIES": int(crash["INCAPACITATING_NON_INJURIES"])
             }
             causes_cash[crash["PRIM_CONTRIBUTORY_CAUSE"]] = 1
             crashes_causes.insert_one(cause)
@@ -70,10 +70,10 @@ def init_db():
                 {
                     "$push": {"CRASHES_LIST": crash_id},
                     "$inc": {
-                        "TOTAL_INJURIES": int(crash["TOTAL_INJURIES"]),
-                        "FATAL_INJURIES": int(crash["FATAL_INJURIES"]),
-                        "INCAPACITATING_INJURIES": int(crash["INCAPACITATING_INJURIES"]),
-                        "INCAPACITATING_NON_INJURIES": int(crash["INCAPACITATING_NON_INJURIES"])
+                        "TOTAL_INJURIES": safe_int(crash["TOTAL_INJURIES"]),
+                        "FATAL_INJURIES": safe_int(crash["FATAL_INJURIES"]),
+                        "INCAPACITATING_INJURIES": safe_int(crash["INCAPACITATING_INJURIES"]),
+                        "INCAPACITATING_NON_INJURIES": safe_int(crash["INCAPACITATING_NON_INJURIES"])
                     }
                 }
             )
@@ -82,8 +82,8 @@ def init_db():
             injury = {
                 "area": crash["BEAT_OF_OCCURRENCE"],
                 "CRASHES_LIST": [crash_id],
-                "injuries_case": crash["TOTAL_INJURIES"] - crash["FATAL_INJURIES"],
-                "death_case": crash["FATAL_INJURIES"]
+                "injuries_case": safe_int(crash["TOTAL_INJURIES"]) - safe_int(crash["FATAL_INJURIES"]),
+                "death_case": safe_int(crash["FATAL_INJURIES"])
             }
             injuries_cash[crash["PRIM_CONTRIBUTORY_CAUSE"]] = 1
             injuries_by_area_info.insert_one(injury)
@@ -93,8 +93,8 @@ def init_db():
                 {
                     "$push": {"CRASHES_LIST": crash_id},
                     "$inc": {
-                        "injuries_case": int(crash["TOTAL_INJURIES"]),
-                        "death_case": int(crash["FATAL_INJURIES"])
+                        "injuries_case": safe_int(crash["TOTAL_INJURIES"]),
+                        "death_case": safe_int(crash["FATAL_INJURIES"])
                     }
                 }
             )
@@ -113,13 +113,18 @@ def get_week_range(date):
     return start.date(), end.date()
 
 def update_collection(collection, cache, key, field_name):
-
     if cache.get(key) is None:
-        doc = {field_name: key, "amount": 1}
+        doc = {field_name: str(key), "amount": 1}
         cache[key] = 1
         collection.insert_one(doc)
     else:
         collection.update_one(
-            {field_name: key},
+            {field_name: str(key)},
             {"$inc": {"amount": 1}}
         )
+
+def safe_int(value, default=0):
+    try:
+        return int(value) if value.strip() else default
+    except ValueError:
+        return default
