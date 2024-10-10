@@ -2,8 +2,6 @@ import csv
 import os
 from datetime import datetime, timedelta
 
-from annotated_types.test_cases import cases
-
 from database.connect import crashes, daily_crashes, weekly_crashes, monthly_crashes, areas, injuries_by_area_info, \
     crashes_causes
 
@@ -38,11 +36,11 @@ def init_db():
         crash = {
             "CRASH_RECORD_ID": row["CRASH_RECORD_ID"],
             "CRASH_DATE": crash_date,
-            "OCCURRENCE_OF_BEAT": row["OCCURRENCE_OF_BEAT"],
-            "TOTAL_INJURIES": row["TOTAL_INJURIES"],
-            "FATAL_INJURIES": row["FATAL_INJURIES"],
-            "INCAPACITATING_INJURIES": row["INCAPACITATING_INJURIES"],
-            "INCAPACITATING_NON_INJURIES": row["INCAPACITATING_NON_INJURIES"],
+            "BEAT_OF_OCCURRENCE": row["BEAT_OF_OCCURRENCE"],
+            "TOTAL_INJURIES": row["INJURIES_TOTAL"],
+            "FATAL_INJURIES": row["INJURIES_FATAL"],
+            "INCAPACITATING_INJURIES": row["INJURIES_INCAPACITATING"],
+            "INCAPACITATING_NON_INJURIES": row["INJURIES_NON_INCAPACITATING"],
             "PRIM_CONTRIBUTORY_CAUSE": row["PRIM_CONTRIBUTORY_CAUSE"],
             "SEC_CONTRIBUTORY_CAUSE": row["SEC_CONTRIBUTORY_CAUSE"]
         }
@@ -53,7 +51,7 @@ def init_db():
         update_collection(daily_crashes, daily_cash, crash_date, "date")
         update_collection(weekly_crashes, weekly_cash, get_week_range(crash_datetime)[0], "start_date")
         update_collection(monthly_crashes, monthly_cash, (crash_date.month, crash_date.year), "month")
-        update_collection(areas, area_cash, crash["OCCURRENCE_OF_BEAT"], "area")
+        update_collection(areas, area_cash, crash["BEAT_OF_OCCURRENCE"], "area")
 
         if causes_cash.get(crash["PRIM_CONTRIBUTORY_CAUSE"]) is None:
             cause = {
@@ -82,7 +80,7 @@ def init_db():
 
         if injuries_cash.get(crash["PRIM_CONTRIBUTORY_CAUSE"]) is None:
             injury = {
-                "area": crash["OCCURRENCE_OF_BEAT"],
+                "area": crash["BEAT_OF_OCCURRENCE"],
                 "CRASHES_LIST": [crash_id],
                 "injuries_case": crash["TOTAL_INJURIES"] - crash["FATAL_INJURIES"],
                 "death_case": crash["FATAL_INJURIES"]
