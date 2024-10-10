@@ -4,7 +4,7 @@ from repository.repository import get_all_crashes, get_all_daily_crashes, get_al
     get_all_monthly_crashes, get_all_crash_causes, get_all_areas, get_all_injuries_by_area, get_injuries_by_area, \
     get_monthly_crashes_by_date, get_weekly_crashes_by_date, get_daily_crashes_by_date
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 import json
 from bson import json_util
 
@@ -84,28 +84,31 @@ def injuries_by_area():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route('/daily_crashes/<date>', methods=['GET'])
+@app.route('/daily_crashes/date', methods=['GET'])
 def get_daily_crashes_date(date):
     try:
-        result = get_daily_crashes_by_date(date)
+        date_str = request.args.get('date')
+        result = get_daily_crashes_by_date(date_str)
         return jsonify(parse_json(result)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/weekly_crashes/<date>', methods=['GET'])
-def get_weekly_crashes_by(date):
+@app.route('/weekly_crashes/date', methods=['GET'])
+def get_weekly_crashes_by():
     try:
-        result = get_weekly_crashes_by_date(date)
+        date_str = request.args.get('date')
+        result = get_weekly_crashes_by_date(date_str)
         return jsonify(parse_json(result)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
 
-@app.route('/monthly_crashes/<date>', methods=['GET'])
-def get_monthly_crashes_date(date):
+@app.route('/monthly_crashes/date', methods=['GET'])
+def get_monthly_crashes_date():
     try:
-        result = get_monthly_crashes_by_date(date)
+        date_str = request.args.get('date')
+        result = get_monthly_crashes_by_date(date_str)
         return jsonify(parse_json(result)), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 500
