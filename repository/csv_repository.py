@@ -100,6 +100,13 @@ def init_db():
                 }
             )
 
+    daily_crashes.create_index({'date': 1})
+    weekly_crashes.create_index({'start_date': 1})
+    monthly_crashes.create_index({'month': 1})
+    injuries_by_area_info.create_index({'area': 1})
+    areas.create_index({'area':1})
+
+
 def update_collection(collection, cache, key, field_name):
     if cache.get(key) is None:
         doc = {field_name: str(key), "amount": 1}
