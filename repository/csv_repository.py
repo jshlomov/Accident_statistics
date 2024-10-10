@@ -20,7 +20,7 @@ def read_csv(csv_path):
            yield row
 
 def init_db():
-    csv_path = './data/fake.csv'
+    csv_path = './data/data.csv'
     crashes.drop()
     daily_crashes.drop()
     weekly_crashes.drop()

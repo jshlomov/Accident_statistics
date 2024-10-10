@@ -7,6 +7,7 @@ from repository.repository import get_all_crashes, get_all_daily_crashes, get_al
 
 def test_get_all_crashes():
     res = get_all_crashes()
+    l = len(res)
     assert len(res) > 0
 
 
