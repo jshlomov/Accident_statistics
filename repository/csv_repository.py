@@ -1,9 +1,10 @@
 import csv
-import os
-from datetime import datetime, timedelta
+
 
 from database.connect import crashes, daily_crashes, weekly_crashes, monthly_crashes, areas, injuries_by_area_info, \
     crashes_causes
+from utils.date_util import parse_date, get_week_range
+from utils.parsing_util import safe_int
 
 daily_cash: dict = {}
 weekly_cash: dict = {}
@@ -99,19 +100,6 @@ def init_db():
                 }
             )
 
-
-
-
-def parse_date(date_str: str):
-    has_seconds = len(date_str.split(' ')) > 2
-    date_format = '%m/%d/%Y %H:%M:%S %p' if has_seconds else '%m/%d/%Y %H:%M'
-    return datetime.strptime(date_str, date_format)
-
-def get_week_range(date):
-    start = date - timedelta(days=date.weekday())
-    end = start + timedelta(days=6)
-    return start.date(), end.date()
-
 def update_collection(collection, cache, key, field_name):
     if cache.get(key) is None:
         doc = {field_name: str(key), "amount": 1}
@@ -122,9 +110,3 @@ def update_collection(collection, cache, key, field_name):
             {field_name: str(key)},
             {"$inc": {"amount": 1}}
         )
-
-def safe_int(value, default=0):
-    try:
-        return int(value) if value.strip() else default
-    except ValueError:
-        return default
