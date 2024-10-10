@@ -85,7 +85,7 @@ def injuries_by_area():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/daily_crashes/date', methods=['GET'])
-def get_daily_crashes_date(date):
+def get_daily_crashes_date():
     try:
         date_str = request.args.get('date')
         result = get_daily_crashes_by_date(date_str)
