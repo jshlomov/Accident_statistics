@@ -38,7 +38,7 @@ def get_weekly_crashes_by_date(date_str):
     return list(weekly_crashes.find({"start_date": str(start_week)}))
 
 def get_monthly_crashes_by_date(date_str):
-    date_obj = str(parse_date(date_str).date())
+    date_obj = parse_date(date_str).date()
     return list(monthly_crashes.find({"month": (date_obj.month, date_obj.year)}))
 
 def get_injuries_by_area(area_name):
